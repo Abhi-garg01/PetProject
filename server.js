@@ -27,7 +27,7 @@ app.get("/admin", function (req, resp) {
     resp.sendFile(path);
 })
 //==================================================
-//Dtabase Connectivity
+//Database Connectivity
 var dbConfigurationObj = {
     host: "localhost",
     user: "root",
@@ -190,7 +190,7 @@ app.post("/profile-edit", function (req, resp) {
         if (result.affectedRows == 1)
             resp.send("Data Updated");
         else
-            resp.send("Invalid emailid");
+            resp.send(" Invalid emailid");
     })
 });
 //==================================================
