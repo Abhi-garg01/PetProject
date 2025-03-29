@@ -60,6 +60,7 @@
             $scope.getMore = function (Email) {
                 $http.get("/moreInfo?Email=" + Email).then(fxOk, fxNotOk);
                 function fxOk(response) {
+                    // alert(JSON.stringify(response.data));
                     $scope.moreInfoArry = response.data;
                 }
                 function fxNotOk(response) {
@@ -76,7 +77,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar"
         style="position: fixed;width: 100%;top: 0;">
         <div class="container">
-            <a class="navbar-brand" href=""><span class="flaticon-pawprint-1 mr-2"></span>Find Your Care Taker</a>
+            <a class="navbar-brand" href=""><span class="flaticon-pawprint-1 mr-2"></span>Pet Care</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
                 aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="fa fa-bars"></span> Menu
@@ -99,7 +100,7 @@
 					<p class="breadcrumbs mb-2"><span class="mr-2"><a href="index.html">Home <i
 									class="ion-ios-arrow-forward"></i></a></span> <span>Contact <i
 								class="ion-ios-arrow-forward"></i></span></p>
-					<h1 class="mb-0 bread">Contact</h1>
+					<h1 class="mb-0 bread">Find Your Care Taker</h1>
 				</div>
 			</div>
 		</div>
@@ -170,9 +171,6 @@
                                 <th>Contact:{{row.contact}}</th>
                             </tr>
                             <tr>
-                                <th>Firm:{{row.firmweb}}</th>
-                            </tr>
-                            <tr>
                                 <th>Address:{{row.address}}</th>
                             </tr>
                             <tr>
@@ -205,7 +203,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 col-lg-3 mb-4 mb-md-0">
-                    <h2 class="footer-heading">Petsitting</h2>
+                    <h2 class="footer-heading">Pet Care</h2>
                     <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
                     <ul class="ftco-footer-social p-0">
                         <li class="ftco-animate"><a href="#" data-toggle="tooltip" data-placement="top"
@@ -235,9 +233,9 @@
                         <ul>
                             <li><span class="icon fa fa-map"></span><span class="text">Bathinda</span></li>
                             <li><a href="#"><span class="icon fa fa-phone"></span><span
-                                        class="text">+91-62807-38720</span></a></li>
+                                        class="text">+91-98775-09737</span></a></li>
                             <li><a href="#"><span class="icon fa fa-paper-plane"></span><span
-                                        class="text">vishalibansal47@gmail.com</span></a></li>
+                                        class="text">abhigarg5969@gmail.com</span></a></li>
                         </ul>
                     </div>
                 </div>

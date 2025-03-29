@@ -29,17 +29,22 @@ app.get("/admin", function (req, resp) {
 //==================================================
 //Database Connectivity
 // var dbConfigurationObj = {
-//     host: "localhost",
+//     host: "127.0.0.1",
 //     user: "root",
-//     password: "",
-//     database: "project"
+//     password: "A#1134@grg",
+//     database: "projects"
 // };
+
 var dbConfigurationObj = {
-    host: "bglsn6axadazbck8ioft-mysql.services.clever-cloud.com",
-    user: "ueu6b1h8cfkehbsw",
-    password: "vAevkQB0HgTJrGYih2Lp",
-    database: "bglsn6axadazbck8ioft"
+    host: "bdswuctalkpegevloytk-mysql.services.clever-cloud.com",
+    user: "u0kpnflpji7suos3",
+    password: "iY0YjOwxbr3hTjRWfHoQ",
+    database: "bdswuctalkpegevloytk",
+    dateStrings:true,
+    kepAlive:10000,
+    enableKeepAlive:true
 };
+
 //==================================================
 
 var dbRef = mysql.createConnection(dbConfigurationObj);
@@ -47,7 +52,25 @@ dbRef.connect(function (err) {
     if (err == null)
         console.log("Mysql server connected");
     else
-        console.log(err.message);
+        console.log("MySQL connection error: ", err.message);
+});
+
+// Handle database connection loss and automatically reconnect
+dbRef.on('error', function(err) {
+    console.log('Database error:', err);
+    if(err.code === 'PROTOCOL_CONNECTION_LOST') {
+        console.log('Database connection lost. Reconnecting...');
+        dbRef = mysql.createConnection(dbConfigurationObj);
+        dbRef.connect(function(err) {
+            if (err) {
+                console.log('Error reconnecting to database:', err);
+            } else {
+                console.log('Database reconnected successfully');
+            }
+        });
+    } else {
+        throw err;
+    }
 });
 //==================================================
 
@@ -67,13 +90,13 @@ app.get("/db-signup", function (req, resp) {
             var transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
-                    user: 'vishalibansal47@gmail.com',
-                    pass: 'gzfngfvqunzmphvq'
+                    user: 'gargabhi341@gmail.com',
+                    pass: 'gwbu thmu nvkx plld'
                 }
             });
 
             var mailOptions = {
-                from: 'vishalibansal47@gmail.com',
+                from: 'gargabhi341@gmail.com',
                 to: mailer,
                 subject: 'Welcome To PetCare',
                 text: 'Sign Up Successfully.....'
@@ -96,29 +119,67 @@ app.get("/db-signup", function (req, resp) {
 //==================================================
 
 app.get("/db-login", function (req, resp) {
-
+    console.log("Login request received:", req.query);
+    
+    // Verify that we have the required parameters
+    if (!req.query.email || !req.query.pwd) {
+        console.log("Missing email or password");
+        return resp.status(400).send("Email and password are required");
+    }
+    
+    try {
     var data = [req.query.email, req.query.pwd];
-    dbRef.query("select * from users where Email=? and Password=?", data, function (err, table) {
-
-        if (err != null)
-            resp.send(err.toString());
-
-        else if (table.length == 1) {
-            if (table[0].status == 1) {
-
-                if (table[0].UserType == "Client")
-                    resp.send("Client Logined");
-                else if (table[0].UserType == "Care Taker")
-                    resp.send("Care Taker Logined");
-
+        
+        // Add timeout to ensure response is sent even if database query hangs
+        const queryTimeout = setTimeout(() => {
+            console.log("Database query timeout");
+            if (!resp.headersSent) {
+                resp.status(500).send("Database query timeout. Please try again.");
             }
-            else if (table[0].status == 0) {
+        }, 5000);
+        
+        dbRef.query("select * from users where email=? and password=?", data, function (err, table) {
+            // Clear the timeout since we got a response
+            clearTimeout(queryTimeout);
+            
+            console.log("Query results:", err, table);
+            
+            if (err) {
+                console.log("Database error:", err);
+                if (!resp.headersSent) {
+                    resp.status(500).send("Database error: " + err.message);
+                }
+                return;
+            }
+
+            if (table && table.length == 1) {
+                if (table[0].status == 1) {
+                    console.log("Valid login for:", table[0].userType);
+                    if (table[0].userType == "Client") {
+                        console.log("Sending 'Client Logined' response");
+                        return resp.send("Client Logined");
+                    } else if (table[0].userType == "Care Taker") {
+                        console.log("Sending 'Care Taker Logined' response");
+                        return resp.send("Care Taker Logined");
+                    } else {
+                        console.log("Unknown user type:", table[0].UserType);
+                        return resp.send("Unknown user type");
+                    }
+                } else if (table[0].status == 0) {
+                    console.log("User is blocked");
                 resp.send("You Are Blocked");
+                }
+            } else {
+                console.log("Invalid login attempt");
+                resp.send("Invalid (Please Check Email Or Password)");
             }
+        });
+    } catch (ex) {
+        console.log("Exception in login handler:", ex);
+        if (!resp.headersSent) {
+            resp.status(500).send("Server error: " + ex.message);
         }
-        else
-            resp.send("Invalid (Please Check Email Or Password)");
-    });
+    }
 });
 //==================================================
 
@@ -220,7 +281,7 @@ app.get("/show-all-users", function (req, resp) {
 
 app.get("/block-user", function (req, resp) {
     var data = [req.query.Email];
-    dbRef.query("update users set status=0 where Email=?", data, function (err, table) {
+    dbRef.query("update users set status=0 where email=?", data, function (err, table) {
         if (err)
             resp.send(err.sqlMsg);
         else
@@ -380,11 +441,14 @@ app.get("/fetch-all-caretakers", function (req, resp) {
 app.get("/moreInfo", function (req, resp) {
     var data = [req.query.Email];
     dbRef.query("select * from caretaker where email=?", data, function (err, table) {
-        if (err)
+        if (err){
+            console.log("here");
             resp.send(err.sqlMessage);
-        else
+        }
+        else{
+            console.log(table.toString());
             resp.send(table);
-
+        }
     });
 
 });

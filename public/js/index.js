@@ -12,7 +12,7 @@ $(document).ready(function () {
         }
         else {
             $(this).css("border", "1px solid red");
-            $("#errEmail").html("Invalid Email");
+            $("#errEmail").html("Please enter your valid Email");
             //$("#errEmail").removeClass("ok-pic").addClass("not-ok-pic");
         }
     });
@@ -53,7 +53,7 @@ $(document).ready(function () {
         }
         else {
             $(this).removeClass("ok").addClass("not-ok");
-            $("#err-Email").html("Invalid Email");
+            $("#err-Email").html("Please enter your valid Email");
             //$("#errEmail").removeClass("ok-pic").addClass("not-ok-pic");
         }
     });
